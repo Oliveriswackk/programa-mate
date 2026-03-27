@@ -1,8 +1,9 @@
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.DoubleUnaryOperator;
+import javax.swing.*;
 
 public class Main {
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -17,20 +18,29 @@ public class Main {
         System.out.print("Ingresa extremo derecho b: ");
         double b = scanner.nextDouble();
 
-        System.out.print("Ingresa tolerancia (ej. 0.0004): ");
+        System.out.print("Ingresa tolerancia (ej. 1e-6): ");
         double tol = scanner.nextDouble();
 
+        System.out.print("Ingresa número máximo de iteraciones: ");
+        int maxIter = scanner.nextInt();
+
         try {
-            java.util.function.DoubleUnaryOperator f = Funcion.crearFuncion(expresion);
-            List<Biseccion.Iteracion> iteraciones = Biseccion.biseccion(a, b, tol, f);
+            DoubleUnaryOperator f = Funcion.crearFuncion(expresion);
+            List<Biseccion.Iteracion> iteraciones = Biseccion.biseccion(a, b, tol, f, maxIter);
 
             Biseccion.mostrarIteraciones(iteraciones);
-            Biseccion.graficar(iteraciones, f, expresion);
 
-            if (!iteraciones.isEmpty()) {
-                System.out.printf("\nRaíz final calculada: %.10f\n", iteraciones.get(iteraciones.size() - 1).c);
-                System.out.println("Error estimado: " + iteraciones.get(iteraciones.size() - 1).error);
-            }
+            SwingUtilities.invokeLater(() -> {
+                JFrame frame = new JFrame("Bisección - " + expresion);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setSize(900, 600);
+
+                GraficoPanel graficoPanel = new GraficoPanel(iteraciones, f, expresion);
+                frame.add(graficoPanel);
+
+                frame.setVisible(true);
+            });
+
         } catch (IllegalArgumentException ex) {
             System.err.println("Error: " + ex.getMessage());
         } finally {
