@@ -25,14 +25,27 @@ public class Biseccion {
         double error = Double.MAX_VALUE;
         int iter = 0;
 
-        while (error > tol && iter < maxIter) {
+        while (iter < maxIter) {
             c = (a + b) / 2.0;
             double fc = f.applyAsDouble(c);
+
             error = (iter == 0) ? Math.abs(b - a) : Math.abs(b - a) / 2.0;
 
             iteraciones.add(new Iteracion(iter + 1, a, b, c, fa, fb, fc, error));
 
-            if (fa * fc < 0) { b = c; fb = fc; } else { a = c; fa = fc; }
+            // DETENER si ya es raíz o cumple tolerancia
+            if (Math.abs(fc) < tol || error < tol) {
+                break;
+            }
+
+            if (fa * fc < 0) {
+                b = c;
+                fb = fc;
+            } else {
+                a = c;
+                fa = fc;
+            }
+
             iter++;
         }
         return iteraciones;
