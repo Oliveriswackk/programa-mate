@@ -14,7 +14,7 @@ public class GraficoPanel extends JPanel {
         this.f = f;
         this.expresion = expresion;
         setLayout(new BorderLayout());
-        setBackground(new Color(255, 245, 250)); // fondo claro con tintes rosados
+        setBackground(Color.WHITE); // fondo claro
 
         addTabla();
     }
@@ -49,24 +49,45 @@ public class GraficoPanel extends JPanel {
         if (iteraciones.isEmpty()) return;
 
         int width = getWidth();
-        int height = getHeight() - 260; // dejando espacio para la tabla
+        int height = Math.max(100, getHeight() - 260); // espacio para tabla
 
         double minX = iteraciones.stream().mapToDouble(it -> it.a).min().orElse(0);
         double maxX = iteraciones.stream().mapToDouble(it -> it.b).max().orElse(1);
         double minY = iteraciones.stream().mapToDouble(it -> f.applyAsDouble(it.c)).min().orElse(0);
         double maxY = iteraciones.stream().mapToDouble(it -> f.applyAsDouble(it.c)).max().orElse(1);
 
-        g.setColor(new Color(255, 200, 220));
+        // Agregar margen vertical
+        double margin = 0.1 * (maxY - minY);
+        minY -= margin;
+        maxY += margin;
+
+        // Fondo del gráfico
+        g.setColor(new Color(240, 240, 240));
         g.fillRect(0, 0, width, height);
 
-        g.setColor(Color.MAGENTA);
+        // Dibujar puntos y línea de función
+        g.setColor(Color.BLUE);
+        int prevX = -1, prevY = -1;
         for (Biseccion.Iteracion it : iteraciones) {
-            int xPix = (int) ((it.c - minX) / (maxX - minX) * (width - 1));
-            int yPix = (int) ((maxY - f.applyAsDouble(it.c)) / (maxY - minY) * (height - 1));
+            int xPix = (int)((it.c - minX) / (maxX - minX) * (width - 1));
+            int yPix = (int)((maxY - f.applyAsDouble(it.c)) / (maxY - minY) * (height - 1));
             g.fillOval(xPix - 3, yPix - 3, 6, 6);
+
+            if(prevX >= 0) {
+                g.drawLine(prevX, prevY, xPix, yPix);
+            }
+            prevX = xPix;
+            prevY = yPix;
         }
 
+        // Título del gráfico
         g.setColor(Color.BLACK);
+        g.setFont(new Font("Segoe UI", Font.BOLD, 16));
         g.drawString("Gráfico aproximado de " + expresion, 10, 20);
+
+        // Ejes X y Y
+        g.setColor(Color.DARK_GRAY);
+        g.drawLine(0, height - 1, width, height - 1); // eje X
+        g.drawLine(0, 0, 0, height);                  // eje Y
     }
 }
