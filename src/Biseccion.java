@@ -25,7 +25,7 @@ public class Biseccion {
         }
     }
 
-    public static List<Iteracion> biseccion(double a, double b, double tol, int maxIter, java.util.function.DoubleUnaryOperator f) {
+    public static List<Iteracion> biseccion(double a, double b, java.util.function.DoubleUnaryOperator f) {
         List<Iteracion> iteraciones = new ArrayList<>();
 
         double fa = f.applyAsDouble(a);
@@ -38,28 +38,30 @@ public class Biseccion {
         double c = a;
         double error = Double.MAX_VALUE;
 
-        for (int i = 1; i <= maxIter; i++) {
+        while (true) { // Eliminamos el límite de iteraciones
             c = (a + b) / 2.0;
             double fc = f.applyAsDouble(c);
 
-            if (i == 1) {
+            if (iteraciones.isEmpty()) {
                 error = Math.abs(b - a);
             } else {
                 error = Math.abs(b - a) / 2.0;
             }
 
-            iteraciones.add(new Iteracion(i, a, b, c, fa, fb, fc, error));
+            iteraciones.add(new Iteracion(iteraciones.size() + 1, a, b, c, fa, fb, fc, error));
 
-            if (Math.abs(fc) < tol || error <= tol) {
-                break;
-            }
-
+            // Eliminamos la condición de tolerancia
             if (fa * fc < 0) {
                 b = c;
                 fb = fc;
             } else {
                 a = c;
                 fa = fc;
+            }
+
+            // Condición de salida: cuando el intervalo es suficientemente pequeño
+            if (error < 1e-10) {
+                break;
             }
         }
 

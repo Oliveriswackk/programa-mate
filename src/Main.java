@@ -17,15 +17,12 @@ public class Main {
         System.out.print("Ingresa extremo derecho b: ");
         double b = scanner.nextDouble();
 
-        System.out.print("Ingresa tolerancia (ej. 1e-6): ");
+        System.out.print("Ingresa tolerancia (ej. 0.0004): ");
         double tol = scanner.nextDouble();
-
-        System.out.print("Ingresa número máximo de iteraciones: ");
-        int maxIter = scanner.nextInt();
 
         try {
             java.util.function.DoubleUnaryOperator f = Funcion.crearFuncion(expresion);
-            List<Biseccion.Iteracion> iteraciones = Biseccion.biseccion(a, b, tol, maxIter, f);
+            List<Biseccion.Iteracion> iteraciones = Biseccion.biseccion(a, b, tol, f);
 
             Biseccion.mostrarIteraciones(iteraciones);
             Biseccion.graficar(iteraciones, f, expresion);
